@@ -1,0 +1,43 @@
+name: nyumbani_app
+description: "A new Flutter project."
+publish_to: "none"
+version: 0.1.0
+
+environment:
+  sdk: ^3.8.1
+
+dependencies:
+  collection: ^1.19.1
+  flutter:
+    sdk: flutter
+  flutter_layout_grid: ^2.0.8
+  flutter_riverpod: ^2.6.1
+  go_router: ^16.2.4
+  intl: ^0.20.2
+  paged_vertical_calendar: ^1.1.10
+  phosphor_flutter: ^2.1.0
+  shared_preferences: ^2.5.3
+  table_calendar: ^3.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/onboarding/
+    - assets/images/listing/
+
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
+        - asset: assets/fonts/Poppins-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Poppins-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Poppins-Light.ttf
+          weight: 300
