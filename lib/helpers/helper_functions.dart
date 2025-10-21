@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nyumbani_app/models/amenities.dart';
+import 'package:nyumbani_app/models/guest_info.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class HelperFunctions {
@@ -104,5 +105,23 @@ class HelperFunctions {
     if (endDate.isBefore(startDate)) return 0;
 
     return endDate.difference(startDate).inDays;
+  }
+
+  static String getGuestSummary(GuestInfo info) {
+    final parts = <String>[];
+
+    if (info.adults > 0) {
+      parts.add('${info.adults} ${info.adults == 1 ? 'adulte' : 'adultes'} ');
+    }
+    if (info.children > 0) {
+      parts.add(
+        '${info.children} ${info.children == 1 ? "enfant" : "enfants"}',
+      );
+    }
+    if (info.babies > 0) {
+      parts.add('${info.babies} ${info.babies == 1 ? "bébé" : "bébés"}');
+    }
+
+    return parts.join(', ');
   }
 }

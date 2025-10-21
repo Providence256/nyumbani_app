@@ -9,13 +9,66 @@ import 'package:nyumbani_app/models/listing.dart';
 import 'package:nyumbani_app/utils/constants/app_colors.dart';
 import 'package:nyumbani_app/utils/constants/app_sizes.dart';
 
-class GuestInfoModal extends ConsumerWidget {
+class GuestInfoModal extends ConsumerStatefulWidget {
   const GuestInfoModal({super.key, required this.listing});
   final Listing listing;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final bookingProvider = ref.watch(bookingNotifierProvider);
+  ConsumerState<GuestInfoModal> createState() => _GuestInfoModalState();
+}
+
+class _GuestInfoModalState extends ConsumerState<GuestInfoModal> {
+  late int _tempAdults;
+  late int _tempChildren;
+  late int _tempBabies;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final currentGuestInfo = ref.read(bookingNotifierProvider).guestInfo;
+    _tempAdults = currentGuestInfo.adults;
+    _tempChildren = currentGuestInfo.children;
+    _tempBabies = currentGuestInfo.babies;
+  }
+
+  int get _availableAdults {
+    return min(widget.listing.maxGuest - _tempChildren, 10);
+  }
+
+  int get _availbleChildren {
+    return min(widget.listing.maxGuest - _tempAdults, 10);
+  }
+
+  void _updateTempAdults(int value) {
+    setState(() {
+      _tempAdults = min(value, _availableAdults);
+    });
+  }
+
+  void _updatTempChildren(int value) {
+    setState(() {
+      _tempChildren = min(value, _availbleChildren);
+    });
+  }
+
+  void _updateTempBabies(int value) {
+    setState(() {
+      _tempBabies = value;
+    });
+  }
+
+  void _saveChanges() {
+    ref.read(bookingNotifierProvider.notifier).updateAdults(_tempAdults);
+    ref.read(bookingNotifierProvider.notifier).updateChildren(_tempChildren);
+
+    ref.read(bookingNotifierProvider.notifier).updateInfants(_tempBabies);
+
+    context.pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       height: MediaQuery.sizeOf(context).height * 0.65,
       decoration: BoxDecoration(
@@ -34,7 +87,7 @@ class GuestInfoModal extends ConsumerWidget {
                     vertical: AppSizes.p10,
                   ),
                   child: Text(
-                    'Ce lieu peut accueillir un maximum de ${listing.maxGuest} visiteurs, bébés non compris',
+                    'Ce lieu peut accueillir un maximum de ${widget.listing.maxGuest} visiteurs, bébés non compris',
                     style: Theme.of(context).textTheme.labelLarge!.copyWith(
                       color: AppColors.textSecondaryLight,
                     ),
@@ -46,23 +99,19 @@ class GuestInfoModal extends ConsumerWidget {
                   title: 'Adultes',
                   subTitle: 'Ages 13+',
                   isAdult: true,
-                  value: bookingProvider.guestInfo.adults,
-                  maxGuest: ref.watch(availableAdultsProvider(listing)),
-                  onchanged: (value) => ref
-                      .read(bookingNotifierProvider.notifier)
-                      .updateAdults(value, listing.maxGuest),
+                  value: _tempAdults,
+                  maxGuest: _availableAdults,
+                  onchanged: _updateTempAdults,
                 ),
                 SizedBox(height: 40),
                 _buildGuestDetails(
                   context: context,
-                  maxGuest: ref.watch(availableChildrenProvider(listing)),
+                  maxGuest: _availbleChildren,
                   title: 'Enfants',
                   subTitle: 'Ages 2 - 12',
                   isAdult: false,
-                  value: bookingProvider.guestInfo.children,
-                  onchanged: (value) => ref
-                      .read(bookingNotifierProvider.notifier)
-                      .updateChildren(value, listing.maxGuest),
+                  value: _tempChildren,
+                  onchanged: _updatTempChildren,
                 ),
                 SizedBox(height: 40),
                 _buildGuestDetails(
@@ -70,11 +119,9 @@ class GuestInfoModal extends ConsumerWidget {
                   title: 'Bébé',
                   subTitle: 'Moins de 2 ans',
                   isAdult: false,
-                  value: bookingProvider.guestInfo.babies,
+                  value: _tempBabies,
                   maxGuest: max(0, 10),
-                  onchanged: (value) => ref
-                      .watch(bookingNotifierProvider.notifier)
-                      .updateInfants(value),
+                  onchanged: _updateTempBabies,
                 ),
               ],
             ),
@@ -212,7 +259,7 @@ class GuestInfoModal extends ConsumerWidget {
             ),
           ),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: _saveChanges,
             style: ElevatedButton.styleFrom(
               padding: EdgeInsets.symmetric(
                 horizontal: AppSizes.p24,

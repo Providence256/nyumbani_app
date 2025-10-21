@@ -10,7 +10,6 @@ import 'package:nyumbani_app/features/booking/presentation/widgets/price_modal.d
 import 'package:nyumbani_app/features/home/presentation/widgets/calendar_widget.dart';
 import 'package:nyumbani_app/features/listing/data/listing_repository.dart';
 import 'package:nyumbani_app/helpers/helper_functions.dart';
-import 'package:nyumbani_app/providers/date_range_notifier.dart';
 import 'package:nyumbani_app/routing/app_router.dart';
 import 'package:nyumbani_app/utils/constants/app_colors.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -23,8 +22,8 @@ class BookingReviewScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final listingValue = ref.watch(watchListingProvider(listingId));
-    final dateRange = ref.watch(dateRangeProvider);
     final bookingstate = ref.watch(bookingNotifierProvider);
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
@@ -90,7 +89,7 @@ class BookingReviewScreen extends ConsumerWidget {
                               BookingReviewDetail(
                                 title: 'Dates',
                                 subtible:
-                                    '${HelperFunctions.formatDay(dateRange.checkInDate ?? DateTime.now())} - ${HelperFunctions.formatFullDate(dateRange.checkOutDate ?? DateTime.now().add(Duration(days: 2)))}',
+                                    '${HelperFunctions.formatDay(bookingstate.dateRange.checkInDate ?? DateTime.now())} - ${HelperFunctions.formatFullDate(bookingstate.dateRange.checkOutDate ?? DateTime.now().add(Duration(days: 2)))}',
                                 buttonText: 'Changer',
                                 onTap: () {
                                   showModalBottomSheet(
@@ -104,8 +103,9 @@ class BookingReviewScreen extends ConsumerWidget {
                               CustomDivider(),
                               BookingReviewDetail(
                                 title: 'Visiteurs',
-                                subtible:
-                                    '${bookingstate.guestInfo.adults} adults, ${bookingstate.guestInfo.children} children, ${bookingstate.guestInfo.babies} bébé',
+                                subtible: HelperFunctions.getGuestSummary(
+                                  bookingstate.guestInfo,
+                                ),
                                 buttonText: 'Changer',
                                 onTap: () {
                                   showModalBottomSheet(
@@ -125,7 +125,8 @@ class BookingReviewScreen extends ConsumerWidget {
                                 onTap: () {
                                   showModalBottomSheet(
                                     context: context,
-                                    builder: (_) => PriceModal(),
+                                    builder: (_) =>
+                                        PriceModal(listing: listing),
                                   );
                                 },
                               ),

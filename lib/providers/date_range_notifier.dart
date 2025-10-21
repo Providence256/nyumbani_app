@@ -36,8 +36,7 @@ class DateRangeNotifier extends StateNotifier<DateRange> {
   }
 }
 
-final dateRangeProvider = StateNotifierProvider<DateRangeNotifier, DateRange>((
-  ref,
-) {
-  return DateRangeNotifier();
-});
+final dateRangeProvider =
+    StateNotifierProvider.autoDispose<DateRangeNotifier, DateRange>((ref) {
+      return DateRangeNotifier();
+    });

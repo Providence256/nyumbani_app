@@ -29,6 +29,12 @@ class _ListingScreenState extends ConsumerState<ListingScreen> {
   int _currentPage = 0;
 
   @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final listingValue = ref.watch(watchListingProvider(widget.listingId));
     return NotificationListener<ScrollNotification>(
@@ -175,9 +181,8 @@ class _ListingScreenState extends ConsumerState<ListingScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            listing.amenities.isEmpty
-                                ? SizedBox.shrink()
-                                : ListingAmenitieList(listing: listing),
+                            if (listing.amenities.isNotEmpty)
+                              ListingAmenitieList(listing: listing),
                             SizedBox(height: 10),
                             ListingDescription(listing: listing),
 
@@ -195,56 +200,48 @@ class _ListingScreenState extends ConsumerState<ListingScreen> {
                   ],
                 ),
         ),
-        bottomNavigationBar: Consumer(
-          builder: (context, ref, child) {
-            final listingValue = ref.watch(
-              watchListingProvider(widget.listingId),
-            );
-            return AsyncValueWidget(
-              value: listingValue,
-              data: (listing) => listing == null
-                  ? Center(child: Text('no data found'))
-                  : Container(
-                      padding: EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        boxShadow: [
-                          BoxShadow(
-                            blurRadius: 15,
-                            offset: Offset(0, 5),
-                            color: Theme.of(context).colorScheme.onPrimaryFixed,
-                          ),
-                        ],
+        bottomNavigationBar: listingValue.when(
+          data: (listing) => listing == null
+              ? SizedBox.shrink()
+              : Container(
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 15,
+                        offset: Offset(0, 5),
+                        color: Theme.of(context).colorScheme.onPrimaryFixed,
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              '\$${listing.price}',
-                              style: Theme.of(context).textTheme.headlineSmall!
-                                  .copyWith(
-                                    decoration: TextDecoration.underline,
-                                  ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 2,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                context.goNamed(
-                                  pathParameters: {'id': widget.listingId},
-                                  AppRoute.bookingReview.name,
-                                );
-                              },
-                              child: Text('Reserver'),
-                            ),
-                          ),
-                        ],
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          '\$${listing.price}',
+                          style: Theme.of(context).textTheme.headlineSmall!
+                              .copyWith(decoration: TextDecoration.underline),
+                        ),
                       ),
-                    ),
-            );
-          },
+                      Expanded(
+                        flex: 2,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            context.goNamed(
+                              pathParameters: {'id': widget.listingId},
+                              AppRoute.bookingReview.name,
+                            );
+                          },
+                          child: Text('Reserver'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+          error: (e, st) => SizedBox.shrink(),
+          loading: () => SizedBox.shrink(),
         ),
       ),
     );

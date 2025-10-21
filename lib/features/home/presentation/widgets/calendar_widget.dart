@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:nyumbani_app/common/custom_divider.dart';
 import 'package:nyumbani_app/common/modal_header.dart';
+import 'package:nyumbani_app/features/booking/presentation/booking_state_notifier.dart';
 import 'package:nyumbani_app/helpers/helper_functions.dart';
 import 'package:nyumbani_app/models/date_range.dart';
 import 'package:nyumbani_app/providers/date_range_notifier.dart';
@@ -201,7 +202,10 @@ class _CalendarWidgetState extends ConsumerState<CalendarWidget> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () => context.pop(),
+                  onPressed: () {
+                    ref.read(bookingNotifierProvider.notifier).syncDateRange();
+                    context.pop();
+                  },
                   style: ElevatedButton.styleFrom(
                     padding: EdgeInsets.symmetric(
                       horizontal: AppSizes.p24,

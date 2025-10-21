@@ -49,7 +49,9 @@ class HomeSearchContainer extends ConsumerWidget {
               );
             },
             text:
-                '${HelperFunctions.formatDay(dateRange.checkInDate ?? DateTime.now())} - ${HelperFunctions.formatFullDate(dateRange.checkOutDate ?? DateTime.now().add(Duration(days: 2)))}',
+                dateRange.checkInDate == null || dateRange.checkOutDate == null
+                ? 'Sélectionner les dates'
+                : '${HelperFunctions.formatDay(dateRange.checkInDate!)} - ${HelperFunctions.formatFullDate(dateRange.checkOutDate!)}',
             icon: PhosphorIcons.calendar(),
           ),
           CustomDivider(),

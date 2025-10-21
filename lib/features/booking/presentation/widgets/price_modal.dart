@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:nyumbani_app/common/custom_divider.dart';
 import 'package:nyumbani_app/common/modal_header.dart';
+import 'package:nyumbani_app/models/listing.dart';
 import 'package:nyumbani_app/utils/constants/app_sizes.dart';
 
 class PriceModal extends StatelessWidget {
-  const PriceModal({super.key});
+  const PriceModal({super.key, required this.listing});
+
+  final Listing listing;
 
   @override
   Widget build(BuildContext context) {
@@ -30,11 +33,11 @@ class PriceModal extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      '4 Nights x \$100',
+                      '4 Nights x \$${listing.price}',
                       style: Theme.of(context).textTheme.labelLarge,
                     ),
                     Text(
-                      '\$400.00',
+                      '\$${listing.price}',
                       style: Theme.of(context).textTheme.labelLarge,
                     ),
                   ],

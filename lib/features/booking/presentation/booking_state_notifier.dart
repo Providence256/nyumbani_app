@@ -5,26 +5,26 @@ import 'package:nyumbani_app/features/booking/domain/booking_state.dart';
 import 'package:nyumbani_app/models/date_range.dart';
 import 'package:nyumbani_app/models/guest_info.dart';
 import 'package:nyumbani_app/models/listing.dart';
+import 'package:nyumbani_app/providers/date_range_notifier.dart';
 
 class BookingStateNotifier extends StateNotifier<BookingState> {
-  BookingStateNotifier()
+  BookingStateNotifier(this.ref)
     : super(BookingState(dateRange: DateRange(), guestInfo: GuestInfo()));
 
-  void updateAdults(int value, int maxGuest) {
-    final children = state.guestInfo.children;
+  final Ref ref;
 
-    final allowedAdults = min(value, maxGuest - children);
-    state = state.copyWith(
-      guestInfo: state.guestInfo.copyWith(adults: allowedAdults),
-    );
+  void syncDateRange() {
+    final globalDateRange = ref.read(dateRangeProvider);
+    state = state.copyWith(dateRange: globalDateRange);
   }
 
-  void updateChildren(int value, int maxGuest) {
-    final adults = state.guestInfo.adults;
+  void updateAdults(int value) {
+    state = state.copyWith(guestInfo: state.guestInfo.copyWith(adults: value));
+  }
 
-    final allowedChildren = min(value, maxGuest - adults);
+  void updateChildren(int value) {
     state = state.copyWith(
-      guestInfo: state.guestInfo.copyWith(children: allowedChildren),
+      guestInfo: state.guestInfo.copyWith(children: value),
     );
   }
 
@@ -37,7 +37,7 @@ final bookingNotifierProvider =
     StateNotifierProvider.autoDispose<BookingStateNotifier, BookingState>((
       ref,
     ) {
-      return BookingStateNotifier();
+      return BookingStateNotifier(ref);
     });
 
 final availableAdultsProvider = Provider.autoDispose.family<int, Listing>((
