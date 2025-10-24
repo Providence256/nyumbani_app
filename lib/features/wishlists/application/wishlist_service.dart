@@ -19,7 +19,7 @@ class WishlistService {
     }
   }
 
-  Stream<Wishlist> _watchWishlist() {
+  Stream<Wishlist> watchWishlist() {
     final user = ref.read(authRepositoryProvider).currentUser;
 
     if (user != null) {
@@ -47,12 +47,14 @@ class WishlistService {
     final updated = wishlist.toggleItem(listingId);
     await _setWishlist(updated);
   }
-
-  Stream<Wishlist> watchWishlist() {
-    return _watchWishlist();
-  }
 }
 
 final wishlistServiceProvider = Provider<WishlistService>((ref) {
   return WishlistService(ref);
+});
+
+final wishlistProvider = StreamProvider<Wishlist>((ref) {
+  final wishlistService = ref.watch(wishlistServiceProvider);
+
+  return wishlistService.watchWishlist();
 });

@@ -10,6 +10,7 @@ import 'package:nyumbani_app/features/listing/presentation/widgets/listing_descr
 import 'package:nyumbani_app/features/listing/presentation/widgets/listing_host_container.dart';
 import 'package:nyumbani_app/features/listing/presentation/widgets/listing_title_details.dart';
 import 'package:nyumbani_app/features/listing/presentation/widgets/listing_user_review.dart';
+import 'package:nyumbani_app/features/wishlists/presentation/wishlist_controller.dart';
 import 'package:nyumbani_app/routing/app_router.dart';
 import 'package:nyumbani_app/utils/constants/app_colors.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -37,6 +38,7 @@ class _ListingScreenState extends ConsumerState<ListingScreen> {
   @override
   Widget build(BuildContext context) {
     final listingValue = ref.watch(watchListingProvider(widget.listingId));
+
     return NotificationListener<ScrollNotification>(
       onNotification: (notification) {
         if (notification.metrics.axis == Axis.vertical) {
@@ -84,9 +86,15 @@ class _ListingScreenState extends ConsumerState<ListingScreen> {
                           opacity: _scrolled ? 1.0 : 0.0,
                           duration: Duration(milliseconds: 300),
                           child: IconButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              ref
+                                  .read(wishlistControllerProvider.notifier)
+                                  .toggleItem(listing.id);
+                            },
                             icon: Icon(
-                              PhosphorIcons.heart(),
+                              ref.watch(isInWishlistProvider(listing.id))
+                                  ? Icons.favorite
+                                  : PhosphorIcons.heart(),
                               color: Colors.red,
                             ),
                           ),

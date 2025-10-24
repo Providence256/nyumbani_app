@@ -13,7 +13,7 @@ class Wishlist {
   }
 
   factory Wishlist.fromMap(Map<String, dynamic> map) {
-    return Wishlist(List<String>.from((map['items'] as List<String>)));
+    return Wishlist(List<String>.from(map['items'] ?? []));
   }
 
   String toJson() => json.encode(toMap());

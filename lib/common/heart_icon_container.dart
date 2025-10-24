@@ -14,19 +14,22 @@ class HeartIconContainer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final wishlist = ref.watch(isInWishlistProvider(listing.id));
     return Container(
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.8),
         shape: BoxShape.circle,
       ),
       child: IconButton(
-        onPressed: () => ref
-            .read(wishlistControllerProvider.notifier)
-            .toggleItem(listing.id),
+        onPressed: () async {
+          await ref
+              .read(wishlistControllerProvider.notifier)
+              .toggleItem(listing.id);
+        },
         icon: Icon(
-          PhosphorIcons.heart(),
-          size: AppSizes.p24,
-          color: AppColors.textSecondaryLight,
+          wishlist ? Icons.favorite : Icons.favorite_border,
+          size: AppSizes.p32,
+          color: wishlist ? Colors.red : AppColors.textSecondaryLight,
         ),
       ),
     );
