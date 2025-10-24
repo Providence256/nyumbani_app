@@ -34,7 +34,7 @@ class _WishlistCardState extends State<WishlistCard> {
                 Positioned(
                   top: AppSizes.p16,
                   right: AppSizes.p16,
-                  child: HeartIconContainer(),
+                  child: HeartIconContainer(listing: widget.listing),
                 ),
               ],
             ),

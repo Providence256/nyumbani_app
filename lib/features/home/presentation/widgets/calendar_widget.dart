@@ -6,6 +6,7 @@ import 'package:nyumbani_app/common/custom_divider.dart';
 import 'package:nyumbani_app/common/modal_header.dart';
 import 'package:nyumbani_app/features/booking/presentation/booking_state_notifier.dart';
 import 'package:nyumbani_app/helpers/helper_functions.dart';
+import 'package:nyumbani_app/models/calendar_mode.dart';
 import 'package:nyumbani_app/models/date_range.dart';
 import 'package:nyumbani_app/providers/date_range_notifier.dart';
 import 'package:nyumbani_app/utils/constants/app_colors.dart';
@@ -14,13 +15,61 @@ import 'package:paged_vertical_calendar/paged_vertical_calendar.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarWidget extends ConsumerStatefulWidget {
-  const CalendarWidget({super.key});
+  const CalendarWidget({super.key, this.mode = CalendarMode.search});
+
+  final CalendarMode mode;
 
   @override
   ConsumerState<CalendarWidget> createState() => _CalendarWidgetState();
 }
 
 class _CalendarWidgetState extends ConsumerState<CalendarWidget> {
+  DateRange? _defaultDateRange;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.mode == CalendarMode.booking) {
+      _defaultDateRange = ref.read(bookingNotifierProvider).dateRange;
+    }
+  }
+
+  DateRange get _displayedDateRange {
+    if (widget.mode == CalendarMode.booking && _defaultDateRange != null) {
+      return _defaultDateRange!;
+    }
+
+    return ref.watch(dateRangeProvider);
+  }
+
+  void _onDateSelected(DateTime date) {
+    if (isPastDay(date)) return;
+
+    if (widget.mode == CalendarMode.search) {
+      ref.read(dateRangeProvider.notifier).selectDates(date);
+    } else {
+      setState(() {
+        if (_defaultDateRange?.checkInDate == null) {
+          _defaultDateRange = DateRange(checkInDate: date, checkOutDate: null);
+        } else if (_defaultDateRange?.checkOutDate == null) {
+          if (date.isBefore(_defaultDateRange!.checkInDate!)) {
+            _defaultDateRange = DateRange(
+              checkInDate: date,
+              checkOutDate: null,
+            );
+          } else {
+            _defaultDateRange = _defaultDateRange!.copyWith(
+              checkInDate: _defaultDateRange!.checkInDate,
+              checkOutDate: date,
+            );
+          }
+        } else {
+          _defaultDateRange = DateRange(checkInDate: date, checkOutDate: null);
+        }
+      });
+    }
+  }
+
   bool isPastDay(DateTime date) {
     final isPast = date.isBefore(DateTime.now().subtract(Duration(days: 1)));
 
@@ -45,7 +94,7 @@ class _CalendarWidgetState extends ConsumerState<CalendarWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final dateRange = ref.watch(dateRangeProvider);
+    final dateRange = _displayedDateRange;
     return Container(
       height: MediaQuery.sizeOf(context).height,
       padding: EdgeInsets.symmetric(horizontal: AppSizes.p10),
@@ -56,7 +105,11 @@ class _CalendarWidgetState extends ConsumerState<CalendarWidget> {
       child: Column(
         spacing: AppSizes.p16,
         children: [
-          ModalHeader(title: 'Selectionner les dates'),
+          ModalHeader(
+            title: widget.mode == CalendarMode.search
+                ? 'Sélectionner les dates'
+                : 'Modifier les dates',
+          ),
           Expanded(
             child: PagedVerticalCalendar(
               minDate: DateTime.utc(2025, 10),
@@ -152,13 +205,10 @@ class _CalendarWidgetState extends ConsumerState<CalendarWidget> {
                   ],
                 );
               },
-              onDayPressed: (DateTime date) {
-                if (isPastDay(date)) return;
-                ref.read(dateRangeProvider.notifier).selectDates(date);
-              },
+              onDayPressed: _onDateSelected,
             ),
           ),
-          _buildFooter(),
+          _buildFooter(dateRange),
         ],
       ),
     );
@@ -168,7 +218,9 @@ class _CalendarWidgetState extends ConsumerState<CalendarWidget> {
     return Padding(padding: EdgeInsets.all(4), child: Text(text));
   }
 
-  Widget _buildFooter() {
+  Widget _buildFooter(DateRange dateRange) {
+    final hasValidRange =
+        dateRange.checkInDate != null && dateRange.checkOutDate != null;
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(AppSizes.p16),
@@ -189,40 +241,46 @@ class _CalendarWidgetState extends ConsumerState<CalendarWidget> {
       ),
       child: Consumer(
         builder: (context, ref, child) {
-          final dateRange = ref.watch(dateRangeProvider);
           return Column(
             spacing: 10,
             children: [
-              dateRange.checkOutDate == null || dateRange.checkInDate == null
-                  ? Text('Date de depart')
-                  : Text(
+              hasValidRange
+                  ? Text(
                       '${HelperFunctions.formatDay(dateRange.checkInDate!)} - ${HelperFunctions.formatFullDate(dateRange.checkOutDate!)}  (${HelperFunctions.calculateNights(dateRange.checkInDate, dateRange.checkOutDate)} Nuits)',
                       style: Theme.of(context).textTheme.labelLarge,
+                    )
+                  : Text(
+                      'Sélectionner les date de début et de fin',
+                      style: Theme.of(context).textTheme.labelLarge,
                     ),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    ref.read(bookingNotifierProvider.notifier).syncDateRange();
-                    context.pop();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: AppSizes.p24,
-                      vertical: AppSizes.p12,
+              if (dateRange.checkInDate != null ||
+                  dateRange.checkOutDate != null)
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      ref
+                          .read(bookingNotifierProvider.notifier)
+                          .updateDateRange(dateRange);
+                      context.pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppSizes.p24,
+                        vertical: AppSizes.p12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                    child: Text(
+                      'Selectionne dates',
+                      style: Theme.of(
+                        context,
+                      ).textTheme.labelLarge!.copyWith(color: Colors.white),
                     ),
-                  ),
-                  child: Text(
-                    'Selectionne dates',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.labelLarge!.copyWith(color: Colors.white),
                   ),
                 ),
-              ),
             ],
           );
         },

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nyumbani_app/models/amenities.dart';
+import 'package:nyumbani_app/models/date_range.dart';
 import 'package:nyumbani_app/models/guest_info.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -105,6 +106,18 @@ class HelperFunctions {
     if (endDate.isBefore(startDate)) return 0;
 
     return endDate.difference(startDate).inDays;
+  }
+
+  // calculate total price
+  static double calculateTotalPrice(DateRange dateRange, double price) {
+    final nights = HelperFunctions.calculateNights(
+      dateRange.checkInDate,
+      dateRange.checkOutDate,
+    );
+
+    final totalPrice = price * nights;
+
+    return totalPrice;
   }
 
   static String getGuestSummary(GuestInfo info) {

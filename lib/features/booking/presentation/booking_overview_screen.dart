@@ -4,6 +4,7 @@ import 'package:nyumbani_app/common/border_container_widget.dart';
 import 'package:nyumbani_app/common/custom_divider.dart';
 import 'package:nyumbani_app/features/booking/presentation/booking_state_notifier.dart';
 import 'package:nyumbani_app/features/listing/data/listing_repository.dart';
+import 'package:nyumbani_app/helpers/helper_functions.dart';
 import 'package:nyumbani_app/utils/constants/app_colors.dart';
 import 'package:nyumbani_app/utils/constants/app_sizes.dart';
 
@@ -14,7 +15,7 @@ class BookingOverviewScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final listingValue = ref.watch(watchListingProvider(listingId));
+    final listing = ref.watch(watchListingProvider(listingId)).value;
     final bookingValue = ref.watch(bookingNotifierProvider);
 
     return Scaffold(
@@ -42,10 +43,13 @@ class BookingOverviewScreen extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            '3 BedRooms appartment',
-                            style: Theme.of(context).textTheme.headlineMedium,
-                            maxLines: 3,
+                          Expanded(
+                            child: Text(
+                              '${listing?.title}',
+                              style: Theme.of(context).textTheme.headlineMedium,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 3,
+                            ),
                           ),
                           Container(
                             width: 35,
@@ -56,7 +60,7 @@ class BookingOverviewScreen extends ConsumerWidget {
                             ),
                             child: Center(
                               child: Text(
-                                '4.9',
+                                '${listing?.rating}',
                                 style: Theme.of(context)
                                     .textTheme
                                     .headlineSmall!
@@ -67,7 +71,7 @@ class BookingOverviewScreen extends ConsumerWidget {
                         ],
                       ),
                       Text(
-                        'N,27M Avenue Nguma, Quartier Jolie Parc ,Ngaliema',
+                        ' ${listing?.address.numero},${listing?.address.avenue},${listing?.address.quartier},${listing?.address.commune}',
                         style: Theme.of(context).textTheme.labelLarge,
                         maxLines: 3,
                       ),
@@ -87,7 +91,9 @@ class BookingOverviewScreen extends ConsumerWidget {
                             style: Theme.of(context).textTheme.labelLarge,
                           ),
                           Text(
-                            'Mon,29 sep 2025',
+                            HelperFunctions.formatFullDate(
+                              bookingValue.dateRange.checkInDate!,
+                            ),
                             style: Theme.of(context).textTheme.bodyLarge,
                           ),
                         ],
@@ -101,7 +107,9 @@ class BookingOverviewScreen extends ConsumerWidget {
                             style: Theme.of(context).textTheme.labelLarge,
                           ),
                           Text(
-                            'Tue,30 sep 2025',
+                            HelperFunctions.formatFullDate(
+                              bookingValue.dateRange.checkOutDate!,
+                            ),
                             style: Theme.of(context).textTheme.bodyLarge,
                           ),
                         ],
@@ -118,7 +126,7 @@ class BookingOverviewScreen extends ConsumerWidget {
                         style: Theme.of(context).textTheme.labelLarge,
                       ),
                       Text(
-                        '4 adultes',
+                        HelperFunctions.getGuestSummary(bookingValue.guestInfo),
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
                     ],
@@ -140,7 +148,7 @@ class BookingOverviewScreen extends ConsumerWidget {
                         style: Theme.of(context).textTheme.headlineMedium,
                       ),
                       Text(
-                        'US\$400.00',
+                        '\$${HelperFunctions.calculateTotalPrice(bookingValue.dateRange, listing!.price)}',
                         style: Theme.of(context).textTheme.headlineMedium,
                       ),
                     ],

@@ -10,6 +10,7 @@ import 'package:nyumbani_app/features/booking/presentation/widgets/price_modal.d
 import 'package:nyumbani_app/features/home/presentation/widgets/calendar_widget.dart';
 import 'package:nyumbani_app/features/listing/data/listing_repository.dart';
 import 'package:nyumbani_app/helpers/helper_functions.dart';
+import 'package:nyumbani_app/models/calendar_mode.dart';
 import 'package:nyumbani_app/routing/app_router.dart';
 import 'package:nyumbani_app/utils/constants/app_colors.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -96,7 +97,9 @@ class BookingReviewScreen extends ConsumerWidget {
                                     isScrollControlled: true,
                                     useSafeArea: true,
                                     context: context,
-                                    builder: (_) => CalendarWidget(),
+                                    builder: (_) => CalendarWidget(
+                                      mode: CalendarMode.booking,
+                                    ),
                                   );
                                 },
                               ),

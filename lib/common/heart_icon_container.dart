@@ -1,23 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nyumbani_app/features/wishlists/presentation/wishlist_controller.dart';
+import 'package:nyumbani_app/models/listing.dart';
 import 'package:nyumbani_app/utils/constants/app_colors.dart';
 import 'package:nyumbani_app/utils/constants/app_sizes.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-class HeartIconContainer extends StatelessWidget {
-  const HeartIconContainer({super.key});
+class HeartIconContainer extends ConsumerWidget {
+  const HeartIconContainer({super.key, required this.listing});
+
+  final Listing listing;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.8),
         shape: BoxShape.circle,
       ),
       child: IconButton(
-        onPressed: () {
-          print('loved clicked');
-        },
+        onPressed: () => ref
+            .read(wishlistControllerProvider.notifier)
+            .toggleItem(listing.id),
         icon: Icon(
           PhosphorIcons.heart(),
           size: AppSizes.p24,

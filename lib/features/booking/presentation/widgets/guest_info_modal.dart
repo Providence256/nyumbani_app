@@ -249,31 +249,36 @@ class _GuestInfoModalState extends ConsumerState<GuestInfoModal> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          TextButton(
-            onPressed: () => context.pop(),
-            child: Text(
-              'Quitter',
-              style: Theme.of(
-                context,
-              ).textTheme.labelLarge!.copyWith(color: AppColors.primary),
+          Expanded(
+            child: TextButton(
+              onPressed: () => context.pop(),
+              child: Text(
+                'Quitter',
+                style: Theme.of(
+                  context,
+                ).textTheme.labelLarge!.copyWith(color: AppColors.primary),
+              ),
             ),
           ),
-          ElevatedButton(
-            onPressed: _saveChanges,
-            style: ElevatedButton.styleFrom(
-              padding: EdgeInsets.symmetric(
-                horizontal: AppSizes.p24,
-                vertical: AppSizes.p12,
+          Expanded(
+            flex: 2,
+            child: ElevatedButton(
+              onPressed: _saveChanges,
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppSizes.p24,
+                  vertical: AppSizes.p12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+              child: Text(
+                'Sauvegarder',
+                style: Theme.of(
+                  context,
+                ).textTheme.labelLarge!.copyWith(color: Colors.white),
               ),
-            ),
-            child: Text(
-              'Sauvegarder',
-              style: Theme.of(
-                context,
-              ).textTheme.labelLarge!.copyWith(color: Colors.white),
             ),
           ),
         ],

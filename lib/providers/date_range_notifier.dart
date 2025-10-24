@@ -2,7 +2,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nyumbani_app/models/date_range.dart';
 
 class DateRangeNotifier extends StateNotifier<DateRange> {
-  DateRangeNotifier() : super(DateRange());
+  DateRangeNotifier() : super(_defaultDateRange);
+
+  static DateRange get _defaultDateRange => DateRange(
+    checkInDate: DateTime.now().add(Duration(days: 1)),
+    checkOutDate: DateTime.now().add(Duration(days: 4)),
+  );
 
   void setStartDate(DateTime date) {
     state = state.copyWith(checkInDate: date, checkOutDate: null);
@@ -33,6 +38,14 @@ class DateRangeNotifier extends StateNotifier<DateRange> {
     } else {
       state = state.copyWith(checkInDate: date, checkOutDate: null);
     }
+  }
+
+  void clearDates() {
+    state = _defaultDateRange;
+  }
+
+  void setDateRange(DateRange dateRange) {
+    state = dateRange;
   }
 }
 

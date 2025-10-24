@@ -1,0 +1,1 @@
+enum CalendarMode { search, booking }

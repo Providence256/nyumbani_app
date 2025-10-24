@@ -154,7 +154,7 @@ class _ListingScreenState extends ConsumerState<ListingScreen> {
                                 Positioned(
                                   top: MediaQuery.of(context).padding.top + 32,
                                   right: 16,
-                                  child: HeartIconContainer(),
+                                  child: HeartIconContainer(listing: listing),
                                 ),
                               if (!_scrolled)
                                 Positioned(
