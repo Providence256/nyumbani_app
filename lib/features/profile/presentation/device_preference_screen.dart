@@ -34,8 +34,8 @@ class DevicePreferenceScreen extends ConsumerWidget {
                 },
                 icon: Icon(
                   theme.brightness == Brightness.dark
-                      ? Icons.dark_mode
-                      : Icons.light_mode,
+                      ? Icons.light_mode
+                      : Icons.dark_mode,
                   color: Theme.of(context).colorScheme.primary,
                 ),
               ),

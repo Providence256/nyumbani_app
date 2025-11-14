@@ -6,7 +6,7 @@ class ListingRepository {
   final List<Listing> _listings = kTestListing;
 
   Listing? getListing(String id) {
-    return _listings.firstWhere((listing) => listing.id == id);
+    return _getListing(_listings, id);
   }
 
   Future<List<Listing>> fetchListings() async {
@@ -20,9 +20,15 @@ class ListingRepository {
   }
 
   Stream<Listing?> watchListing(String id) {
-    return watchListingsList().map(
-      (listings) => listings.firstWhere((listing) => listing.id == id),
-    );
+    return watchListingsList().map((listings) => _getListing(listings, id));
+  }
+
+  static Listing? _getListing(List<Listing> listings, String id) {
+    try {
+      return listings.firstWhere((listing) => listing.id == id);
+    } catch (e) {
+      return null;
+    }
   }
 }
 

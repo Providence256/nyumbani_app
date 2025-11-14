@@ -24,7 +24,6 @@ class BookingReviewScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final listingValue = ref.watch(watchListingProvider(listingId));
     final bookingstate = ref.watch(bookingNotifierProvider);
-
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
@@ -180,7 +179,7 @@ class BookingReviewScreen extends ConsumerWidget {
           onPressed: () {
             context.goNamed(
               pathParameters: {'id': listingId},
-              AppRoute.bokingOverView.name,
+              AppRoute.checkout.name,
             );
           },
           icon: Icon(PhosphorIcons.arrowRight()),

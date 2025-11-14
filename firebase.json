@@ -1,0 +1,91 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "nyumbani-app-92c25",
+          "appId": "1:78548319601:android:3070f855a0d1c2e4a28ad0",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "nyumbani-app-92c25",
+          "appId": "1:78548319601:ios:43f8e1656630b9bca28ad0",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "macos": {
+        "default": {
+          "projectId": "nyumbani-app-92c25",
+          "appId": "1:78548319601:ios:43f8e1656630b9bca28ad0",
+          "uploadDebugSymbols": false,
+          "fileOutput": "macos/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "nyumbani-app-92c25",
+          "configurations": {
+            "android": "1:78548319601:android:3070f855a0d1c2e4a28ad0",
+            "ios": "1:78548319601:ios:43f8e1656630b9bca28ad0",
+            "macos": "1:78548319601:ios:43f8e1656630b9bca28ad0",
+            "web": "1:78548319601:web:c3a5725630fda8a6a28ad0",
+            "windows": "1:78548319601:web:c1a76e2d8b382186a28ad0"
+          }
+        }
+      }
+    }
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run lint",
+        "npm --prefix \"$RESOURCE_DIR\" run build"
+      ]
+    }
+  ],
+  "emulators": {
+    "auth": {
+      "port": 9099
+    },
+    "functions": {
+      "port": 5001
+    },
+    "firestore": {
+      "port": 8080
+    },
+    "ui": {
+      "enabled": true
+    },
+    "singleProjectMode": true
+  },
+  "hosting": {
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

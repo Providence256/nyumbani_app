@@ -4,8 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:nyumbani_app/application_screen.dart';
 import 'package:nyumbani_app/features/authentication/data/auth_repository.dart';
 import 'package:nyumbani_app/features/authentication/presentation/auth_screen.dart';
-import 'package:nyumbani_app/features/booking/presentation/booking_overview_screen.dart';
+import 'package:nyumbani_app/features/authentication/presentation/email_login_screen.dart';
+import 'package:nyumbani_app/features/authentication/presentation/otp_email_verification.dart';
 import 'package:nyumbani_app/features/booking/presentation/booking_review_screen.dart';
+import 'package:nyumbani_app/features/booking/presentation/widgets/checkout_screen.dart';
 import 'package:nyumbani_app/features/home/home_screen.dart';
 import 'package:nyumbani_app/features/listing/presentation/listing_amenity_screen.dart';
 import 'package:nyumbani_app/features/listing/presentation/listing_screen.dart';
@@ -17,6 +19,7 @@ import 'package:nyumbani_app/features/profile/presentation/personnal_info_screen
 import 'package:nyumbani_app/features/profile/presentation/profile_screen.dart';
 import 'package:nyumbani_app/features/trips/presentation/trips_screen.dart';
 import 'package:nyumbani_app/features/wishlists/presentation/wishlists_screen.dart';
+import 'package:nyumbani_app/routing/go_router_refresh_stream.dart';
 
 enum AppRoute {
   onboarding,
@@ -32,8 +35,11 @@ enum AppRoute {
   listing,
   bookingReview,
   bokingOverView,
+  checkout,
   listAmenity,
   authentication,
+  emailLogin,
+  otpEmailVerification,
 }
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -52,18 +58,16 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/',
     navigatorKey: _rootNavigatorKey,
+    refreshListenable: GoRouterRefreshStream(authRepository.authStateChanges()),
     redirect: (context, state) {
       final isLoggedIn = authRepository.currentUser != null;
       final path = state.uri.path;
 
-      if (isLoggedIn) {
-        if (path == '/auth') {
-          return '/home';
+      if (isLoggedIn && path.contains('/auth')) {
+        if (path.contains('/profile/auth')) {
+          return '/profile';
         }
-      } else {
-        if (path == '/profile') {
-          return '/auth';
-        }
+        return '/home';
       }
 
       return null;
@@ -111,12 +115,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                         routes: [
                           GoRoute(
                             parentNavigatorKey: _rootNavigatorKey,
-                            path: '/booking_overview',
-                            name: AppRoute.bokingOverView.name,
-                            builder: (context, state) {
+                            path: '/checkout',
+                            name: AppRoute.checkout.name,
+                            pageBuilder: (context, state) {
                               final listingId = state.pathParameters['id']!;
-                              return BookingOverviewScreen(
-                                listingId: listingId,
+                              return MaterialPage(
+                                fullscreenDialog: true,
+                                child: CheckoutScreen(listingId: listingId),
                               );
                             },
                           ),
@@ -196,12 +201,34 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                       child: DevicePreferenceScreen(),
                     ),
                   ),
+                  GoRoute(
+                    parentNavigatorKey: _rootNavigatorKey,
+                    path: '/auth',
+                    name: AppRoute.authentication.name,
+                    pageBuilder: (context, state) {
+                      return MaterialPage(
+                        fullscreenDialog: true,
+                        child: AuthScreen(),
+                      );
+                    },
+                    routes: [
+                      GoRoute(
+                        parentNavigatorKey: _rootNavigatorKey,
+                        path: '/email-login',
+                        name: AppRoute.emailLogin.name,
+                        builder: (context, state) => EmailLoginScreen(),
+                        routes: [
+                          GoRoute(
+                            parentNavigatorKey: _rootNavigatorKey,
+                            path: '/otp-email-verification',
+                            name: AppRoute.otpEmailVerification.name,
+                            builder: (context, state) => OtpEmailVerification(),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ],
-              ),
-              GoRoute(
-                path: '/auth',
-                name: AppRoute.authentication.name,
-                builder: (context, state) => AuthScreen(),
               ),
             ],
           ),
