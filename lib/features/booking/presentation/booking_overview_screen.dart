@@ -193,7 +193,8 @@ class BookingOverviewScreen extends ConsumerWidget {
           ],
         ),
         child: ElevatedButton(
-          onPressed: () {},
+          onPressed: () =>
+              ref.read(bookingNotifierProvider.notifier).bookListing(listingId),
           child: Text('Réserver maintenant'),
         ),
       ),
